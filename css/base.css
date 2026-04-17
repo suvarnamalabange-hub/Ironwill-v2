@@ -1,0 +1,160 @@
+/* ============================================================
+   IRON WILL — BASE STYLES
+   Reset, body, noise texture, animated background orbs
+   ============================================================ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--ff-body);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--text-100);
+  background: var(--bg-0);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ---- NOISE TEXTURE OVERLAY ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  background-size: 256px 256px;
+}
+
+/* ---- SUBTLE GRID PATTERN ---- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* ---- ANIMATED BACKGROUND ORBS ---- */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  will-change: transform;
+}
+
+.orb1 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(232,64,64,0.06), transparent 70%);
+  top: -25%;
+  left: -15%;
+  animation: orbFloat1 25s ease-in-out infinite alternate;
+}
+
+.orb2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(245,200,66,0.04), transparent 70%);
+  bottom: -25%;
+  right: -15%;
+  animation: orbFloat2 30s ease-in-out infinite alternate;
+}
+
+.orb3 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168,85,247,0.04), transparent 70%);
+  top: 35%;
+  left: 35%;
+  animation: orbFloat3 22s ease-in-out infinite alternate;
+}
+
+.orb4 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.03), transparent 70%);
+  top: 60%;
+  right: 20%;
+  animation: orbFloat1 28s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes orbFloat1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(30px, -20px, 0) scale(1.05); }
+  66%  { transform: translate3d(-20px, 30px, 0) scale(0.95); }
+  100% { transform: translate3d(50px, 40px, 0) scale(1.1); }
+}
+
+@keyframes orbFloat2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-40px, -30px, 0) scale(1.08); }
+  100% { transform: translate3d(30px, -50px, 0) scale(0.95); }
+}
+
+@keyframes orbFloat3 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  25%  { transform: translate3d(40px, 20px, 0) scale(1.1); }
+  75%  { transform: translate3d(-30px, -40px, 0) scale(0.92); }
+  100% { transform: translate3d(20px, -20px, 0) scale(1.05); }
+}
+
+/* ---- SELECTION ---- */
+::selection {
+  background: rgba(245,200,66,0.25);
+  color: var(--text-100);
+}
+
+/* ---- FOCUS VISIBLE ---- */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--rad-sm);
+}
+
+/* ---- LINKS ---- */
+a {
+  color: var(--blue-bright);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-smooth);
+}
+a:hover { color: var(--blue); }
+
+/* ---- IMAGES ---- */
+img { max-width: 100%; display: block; }
+
+/* ---- BUTTON RESET ---- */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}

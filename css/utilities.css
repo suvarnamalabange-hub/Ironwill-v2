@@ -1,0 +1,103 @@
+/* ============================================================
+   IRON WILL — UTILITIES
+   Scrollbar, toast, glassmorphism helpers
+   ============================================================ */
+
+/* ---- SCROLLBAR ---- */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ---- TOAST ---- */
+.toast {
+  position: fixed;
+  bottom: var(--sp-6);
+  right: var(--sp-6);
+  background: var(--bg-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--rad-lg);
+  padding: var(--sp-4) var(--sp-5);
+  font-size: var(--fs-sm);
+  z-index: var(--z-toast);
+  animation: toastIn var(--dur-slow) var(--ease-out);
+  max-width: 360px;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+}
+.toast.closing {
+  animation: toastOut var(--dur-base) var(--ease-smooth) forwards;
+}
+.toast.ok   { border-left: 3px solid var(--green); }
+.toast.err  { border-left: 3px solid var(--red); }
+.toast.warn { border-left: 3px solid var(--gold); }
+.toast.info { border-left: 3px solid var(--blue); }
+
+/* ---- GLASS HELPERS ---- */
+.glass-subtle {
+  background: var(--glass-1);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--border-1);
+}
+.glass-medium {
+  background: var(--glass-2);
+  backdrop-filter: var(--glass-blur-md);
+  border: 1px solid var(--border-2);
+}
+.glass-strong {
+  background: var(--glass-3);
+  backdrop-filter: var(--glass-blur-lg);
+  border: 1px solid var(--border-3);
+}
+
+/* ---- SVG CHART CONTAINER ---- */
+.chart-container {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- VISUALLY HIDDEN (accessibility) ---- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ---- FOOTER ---- */
+.app-footer {
+  text-align: center;
+  padding: var(--sp-8) 0 var(--sp-12);
+  font-size: var(--fs-xs);
+  color: var(--text-20);
+  letter-spacing: var(--ls-wider);
+  font-family: var(--ff-mono);
+}

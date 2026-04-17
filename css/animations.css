@@ -1,0 +1,181 @@
+/* ============================================================
+   IRON WILL — ANIMATIONS
+   Keyframes, micro-interactions, reduced-motion support
+   ============================================================ */
+
+/* ---- ENTRANCE ANIMATIONS ---- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeSlideRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ---- PULSE & GLOW ---- */
+@keyframes rankPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(245,200,66,0.15); }
+  50%      { box-shadow: 0 0 40px rgba(245,200,66,0.35), 0 0 60px rgba(245,200,66,0.10); }
+}
+
+@keyframes activePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(245,200,66,0.35); }
+  50%      { box-shadow: 0 0 18px rgba(245,200,66,0.7); }
+}
+
+@keyframes riskPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+
+@keyframes newBadge {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.4); }
+}
+
+/* ---- SHIMMER & HOLOGRAPHIC ---- */
+@keyframes shimmerStrip {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(200%) rotate(45deg); }
+}
+
+@keyframes holoShimmer {
+  0%   { transform: translateX(-80%) translateY(-80%) rotate(45deg); }
+  100% { transform: translateX(180%) translateY(180%) rotate(45deg); }
+}
+
+@keyframes rotateGradient {
+  0%   { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ---- BREATHING ---- */
+@keyframes breathIn {
+  0% {
+    transform: scale(1);
+    border-color: rgba(245,200,66,0.25);
+    box-shadow: none;
+  }
+  100% {
+    transform: scale(1.4);
+    border-color: rgba(245,200,66,0.7);
+    box-shadow: 0 0 50px rgba(245,200,66,0.25);
+  }
+}
+
+/* ---- GLITCH ---- */
+@keyframes glitch {
+  0%, 94%, 100% { text-shadow: none; }
+  95%  { text-shadow: -3px 0 rgba(0,255,255,0.5), 3px 0 rgba(255,0,0,0.5); }
+  97%  { text-shadow: 3px 0 rgba(0,255,255,0.5), -3px 0 rgba(255,0,0,0.5); }
+  99%  { text-shadow: -1px 0 rgba(0,255,255,0.3), 1px 0 rgba(255,0,0,0.3); }
+}
+
+/* ---- COUNTER TICK ---- */
+@keyframes counterTick {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ---- TOAST ENTRANCE ---- */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateX(40px) scale(0.95); }
+}
+
+/* ---- STAGGERED CHILDREN ---- */
+.stagger-children > * {
+  animation: fadeSlideRight var(--dur-slow) var(--ease-out) both;
+}
+.stagger-children > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2)  { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3)  { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4)  { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5)  { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6)  { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7)  { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8)  { animation-delay: 350ms; }
+.stagger-children > *:nth-child(9)  { animation-delay: 400ms; }
+.stagger-children > *:nth-child(10) { animation-delay: 450ms; }
+
+/* ---- CARD ENTRANCE ---- */
+.card {
+  animation: slideUp var(--dur-slower) var(--ease-out) both;
+}
+
+/* Stats cards stagger */
+.stats-grid .scard:nth-child(1) { animation: slideUp var(--dur-slow) var(--ease-out) 100ms both; }
+.stats-grid .scard:nth-child(2) { animation: slideUp var(--dur-slow) var(--ease-out) 150ms both; }
+.stats-grid .scard:nth-child(3) { animation: slideUp var(--dur-slow) var(--ease-out) 200ms both; }
+.stats-grid .scard:nth-child(4) { animation: slideUp var(--dur-slow) var(--ease-out) 250ms both; }
+.stats-grid .scard:nth-child(5) { animation: slideUp var(--dur-slow) var(--ease-out) 300ms both; }
+
+/* Ring cards stagger */
+.rings-row .ring-card:nth-child(1) { animation: scaleIn var(--dur-slow) var(--ease-out) 200ms both; }
+.rings-row .ring-card:nth-child(2) { animation: scaleIn var(--dur-slow) var(--ease-out) 300ms both; }
+.rings-row .ring-card:nth-child(3) { animation: scaleIn var(--dur-slow) var(--ease-out) 400ms both; }
+
+/* Rank strip */
+.rank-strip {
+  animation: slideUp var(--dur-slower) var(--ease-out) 50ms both;
+}
+
+/* Quote bar */
+.quote-bar {
+  animation: fadeSlideRight var(--dur-slower) var(--ease-out) 300ms both;
+}
+
+/* ---- XP BAR GLOW ANIMATION ---- */
+@keyframes xpGlow {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.2); }
+}
+.xp-bar {
+  animation: xpGlow 3s ease-in-out infinite;
+}
+
+/* ---- REDUCED MOTION ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .orb { display: none; }
+  .breath-ring { animation: none !important; }
+}

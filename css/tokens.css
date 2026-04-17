@@ -1,0 +1,171 @@
+/* ============================================================
+   IRON WILL — DESIGN TOKENS
+   Dark Glassmorphism Design System
+   ============================================================ */
+
+/* --- Custom property animations --- */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --glow-opacity {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+:root {
+  /* ---- COLOR PALETTE ---- */
+  /* Base layers (deep indigo/navy) */
+  --bg-0:    #030308;
+  --bg-1:    #060612;
+  --bg-2:    #0a0a1e;
+  --bg-3:    #0f0f2a;
+  --bg-4:    #151536;
+  --bg-5:    #1c1c42;
+
+  /* Accent colors */
+  --gold:       #f5c842;
+  --gold-dim:   #d4a832;
+  --gold-bright:#ffe066;
+  --red:        #e84040;
+  --red-dim:    #c02020;
+  --red-bright: #ff6b6b;
+  --green:      #22c55e;
+  --green-dim:  #16a34a;
+  --green-bright:#4ade80;
+  --blue:       #3b82f6;
+  --blue-dim:   #2563eb;
+  --blue-bright:#60a5fa;
+  --purple:     #a855f7;
+  --purple-dim: #9333ea;
+  --purple-bright:#c084fc;
+  --cyan:       #06b6d4;
+  --amber:      #f59e0b;
+
+  /* Text */
+  --text-100:   #f0f0ff;
+  --text-90:    rgba(240,240,255,0.90);
+  --text-80:    rgba(240,240,255,0.80);
+  --text-60:    rgba(240,240,255,0.60);
+  --text-40:    rgba(240,240,255,0.40);
+  --text-20:    rgba(240,240,255,0.20);
+  --text-muted: #5a5a8a;
+
+  /* ---- GLASSMORPHISM TIERS ---- */
+  --glass-1:    rgba(255,255,255,0.03);
+  --glass-2:    rgba(255,255,255,0.05);
+  --glass-3:    rgba(255,255,255,0.08);
+  --glass-hover:rgba(255,255,255,0.10);
+  --glass-active:rgba(255,255,255,0.12);
+
+  --glass-blur-sm: blur(8px);
+  --glass-blur-md: blur(16px);
+  --glass-blur-lg: blur(24px);
+  --glass-blur-xl: blur(40px);
+
+  /* ---- BORDERS ---- */
+  --border-1:   rgba(255,255,255,0.06);
+  --border-2:   rgba(255,255,255,0.10);
+  --border-3:   rgba(255,255,255,0.15);
+  --border-glow-gold: rgba(245,200,66,0.30);
+  --border-glow-red:  rgba(232,64,64,0.30);
+  --border-glow-green:rgba(34,197,94,0.30);
+  --border-glow-blue: rgba(59,130,246,0.30);
+  --border-glow-purple:rgba(168,85,247,0.30);
+
+  /* ---- SHADOWS ---- */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:  0 8px 32px rgba(0,0,0,0.4);
+  --shadow-lg:  0 24px 64px rgba(0,0,0,0.5);
+  --shadow-xl:  0 40px 100px rgba(0,0,0,0.6);
+
+  --glow-gold:  0 0 30px rgba(245,200,66,0.25), 0 0 60px rgba(245,200,66,0.10);
+  --glow-red:   0 0 30px rgba(232,64,64,0.25), 0 0 60px rgba(232,64,64,0.10);
+  --glow-green: 0 0 30px rgba(34,197,94,0.25), 0 0 60px rgba(34,197,94,0.10);
+  --glow-blue:  0 0 30px rgba(59,130,246,0.25);
+  --glow-purple:0 0 30px rgba(168,85,247,0.25);
+
+  /* ---- SPACING SCALE (4px base) ---- */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-7:  28px;
+  --sp-8:  32px;
+  --sp-9:  36px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* ---- BORDER RADIUS ---- */
+  --rad-xs:  6px;
+  --rad-sm:  8px;
+  --rad-md:  12px;
+  --rad-lg:  16px;
+  --rad-xl:  20px;
+  --rad-2xl: 24px;
+  --rad-full:9999px;
+
+  /* ---- TYPOGRAPHY ---- */
+  /* Font families */
+  --ff-display: 'Bebas Neue', 'Impact', sans-serif;
+  --ff-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-mono:    'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Fluid type scale */
+  --fs-xs:   clamp(0.625rem, 0.6rem + 0.15vw, 0.75rem);    /* 10–12px */
+  --fs-sm:   clamp(0.6875rem, 0.65rem + 0.2vw, 0.8125rem);  /* 11–13px */
+  --fs-base: clamp(0.8125rem, 0.77rem + 0.25vw, 0.9375rem);  /* 13–15px */
+  --fs-md:   clamp(0.875rem, 0.82rem + 0.3vw, 1.0625rem);    /* 14–17px */
+  --fs-lg:   clamp(1rem, 0.92rem + 0.4vw, 1.25rem);           /* 16–20px */
+  --fs-xl:   clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);         /* 20–28px */
+  --fs-2xl:  clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);          /* 24–36px */
+  --fs-3xl:  clamp(2rem, 1.5rem + 2.5vw, 3.5rem);             /* 32–56px */
+  --fs-4xl:  clamp(2.5rem, 2rem + 3vw, 5rem);                 /* 40–80px */
+
+  /* Font weights */
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* Line heights */
+  --lh-tight:  1.1;
+  --lh-snug:   1.3;
+  --lh-normal: 1.5;
+  --lh-relaxed:1.7;
+
+  /* Letter spacing */
+  --ls-tight:  -0.02em;
+  --ls-normal: 0;
+  --ls-wide:   0.05em;
+  --ls-wider:  0.1em;
+  --ls-display:0.15em;
+
+  /* ---- TRANSITIONS ---- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --dur-fast:  150ms;
+  --dur-base:  250ms;
+  --dur-slow:  400ms;
+  --dur-slower:600ms;
+  --dur-slowest:1000ms;
+
+  /* ---- Z-INDEX SCALE ---- */
+  --z-base:    1;
+  --z-raised:  10;
+  --z-sticky:  200;
+  --z-overlay: 500;
+  --z-modal:   800;
+  --z-emergency:1000;
+  --z-toast:   2000;
+  --z-particle:400;
+}

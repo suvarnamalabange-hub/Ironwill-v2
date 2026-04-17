@@ -1,0 +1,188 @@
+/* ============================================================
+   IRON WILL — LAYOUT
+   Grid systems, containers, responsive breakpoints
+   ============================================================ */
+
+/* ---- CONTENT WRAPPER ---- */
+.wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--sp-6);
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* ---- HEADER ---- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  border-bottom: 1px solid var(--border-1);
+  background: rgba(3,3,8,0.85);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+}
+
+.hdr-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) 0;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.hdr-right {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---- MAIN SECTION PADDING ---- */
+section.page-section {
+  padding: 0 0 var(--sp-8);
+}
+
+/* ---- STATS GRID ---- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-6);
+}
+
+/* ---- PROGRESS RINGS ROW ---- */
+.rings-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-5);
+}
+
+/* ---- MAIN COLUMNS ---- */
+.main-cols {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: var(--sp-5);
+  margin: 0 0 var(--sp-6);
+}
+
+/* ---- SIDEBAR ---- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ---- BOTTOM GRIDS ---- */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-6);
+}
+
+.bottom-grid-2 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-8);
+}
+
+/* ---- CALENDAR GRID ---- */
+.cal-grid-7 {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+/* ---- ACHIEVEMENT GRID ---- */
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-3);
+}
+
+/* ---- HEATMAP GRID ---- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 3px;
+  margin-top: var(--sp-2);
+}
+
+/* ---- SECTION SEPARATOR ---- */
+.section-sep {
+  height: 1px;
+  background: var(--border-1);
+  margin: var(--sp-3) 0 var(--sp-4);
+}
+
+/* ================================================
+   RESPONSIVE BREAKPOINTS
+   ================================================ */
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .main-cols {
+    grid-template-columns: 1fr;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .bottom-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bottom-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .wrap {
+    padding: 0 var(--sp-4);
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rings-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .rank-strip {
+    flex-wrap: wrap;
+  }
+  .rank-stats {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-around;
+  }
+  .ach-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .hdr-inner {
+    gap: var(--sp-3);
+  }
+  .hdr-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 400px) {
+  .ach-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .rings-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--sp-2);
+  }
+  .stats-grid {
+    gap: var(--sp-2);
+  }
+}
