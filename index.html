@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Iron Will — Warrior Discipline System</title>
+  <meta name="description" content="A premium discipline tracking system. Track streaks, build habits, conquer urges, and ascend through warrior ranks.">
+  <meta name="theme-color" content="#060612">
+  <meta name="color-scheme" content="dark">
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Iron Will">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80'>⚔️</text></svg>">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/animations.css">
+  <link rel="stylesheet" href="./css/utilities.css">
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="orb orb4"></div>
+</div>
+<canvas id="particleCanvas"></canvas>
+
+<!-- ========== HEADER ========== -->
+<header>
+<div class="wrap">
+<div class="hdr-inner">
+  <div>
+    <div class="logo">Iron<span class="accent">Will</span>
+      &nbsp;<span style="color:var(--text-muted);font-size:var(--fs-sm);font-family:var(--ff-mono);font-weight:var(--fw-regular)">// WARRIOR SYSTEM v2</span>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="power-badge">
+      ⚡ Power <span class="power-val" id="powerScore">0</span>
+    </div>
+    <div id="riskBadge" class="risk-indicator risk-low" style="margin:0">🟢 Low Risk</div>
+    <button class="btn btn-gold" id="emergencyBtn">🆘 Emergency</button>
+    <button class="btn" id="showOathBtn">📜 Oath</button>
+    <button class="btn" id="exportBtn">📤 Export</button>
+  </div>
+</div>
+</div>
+</header>
+
+<!-- ========== MAIN ========== -->
+<div class="wrap">
+
+<!-- RANK STRIP -->
+<div class="rank-strip" id="rankStrip">
+  <div class="rank-icon-wrap">
+    <div class="rank-icon" id="rankIcon">🧑</div>
+  </div>
+  <div class="rank-info" style="flex:1">
+    <div class="rank-title" id="rankTitle">CIVILIAN</div>
+    <div class="rank-sub">Begin your transformation. The journey of 1000 days starts with one.</div>
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:0%"></div></div>
+    <div class="xp-label"><span id="xpCurrent">0 XP</span><span id="xpNext">→ 100 XP for next rank</span></div>
+  </div>
+  <div class="rank-stats">
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs1" style="color:var(--gold)">0</div>
+      <div class="rank-stat-lbl">Days Clean</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs2" style="color:var(--green)">0%</div>
+      <div class="rank-stat-lbl">Win Rate</div>
+    </div>
+    <div class="rank-stat">
+      <div class="rank-stat-val" id="rs3" style="color:var(--purple)">0</div>
+      <div class="rank-stat-lbl">Urges Beat</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="scard scard-streak">
+    <div class="scard-icon">🔥</div>
+    <div class="scard-val" id="sCurStreak">0</div>
+    <div class="scard-lbl">Current Streak</div>
+  </div>
+  <div class="scard scard-longest">
+    <div class="scard-icon">🏆</div>
+    <div class="scard-val" id="sLongStreak">0</div>
+    <div class="scard-lbl">Longest Streak</div>
+  </div>
+  <div class="scard scard-clean">
+    <div class="scard-icon">✅</div>
+    <div class="scard-val" id="sTotalClean">0</div>
+    <div class="scard-lbl">Clean Days</div>
+  </div>
+  <div class="scard scard-rel">
+    <div class="scard-icon">⚡</div>
+    <div class="scard-val" id="sTotalRel">0</div>
+    <div class="scard-lbl">Relapses</div>
+  </div>
+  <div class="scard scard-xp">
+    <div class="scard-icon">✨</div>
+    <div class="scard-val" id="sTotalXP">0</div>
+    <div class="scard-lbl">Total XP</div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div class="quote-bar">
+  <div style="flex:1">
+    <div class="quote-txt" id="quoteTxt"></div>
+    <div class="quote-author" id="quoteAuthor"></div>
+  </div>
+  <button class="btn" id="quoteRefreshBtn" aria-label="Next quote">↻</button>
+</div>
+
+<!-- PROGRESS RINGS -->
+<div class="rings-row">
+  <div class="ring-card">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="38"/>
+        <circle class="ring-fill" id="ring7" cx="45" cy="45" r="38" stroke="#f59e0b" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring7pct" style="color:#f59e0b">0%</div>
+        <div class="ring-day" id="ring7day">0/7</div>
+      </div>
+    </div>
+    <div class="ring-lbl" style="color:#f59e0b">7 DAY</div>
+    <div class="ring-goal">First Week</div>
+  </div>
+
+  <div class="ring-card">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="38"/>
+        <circle class="ring-fill" id="ring30" cx="45" cy="45" r="38" stroke="var(--green)" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring30pct" style="color:var(--green)">0%</div>
+        <div class="ring-day" id="ring30day">0/30</div>
+      </div>
+    </div>
+    <div class="ring-lbl" style="color:var(--green)">30 DAY</div>
+    <div class="ring-goal">Monk Mode</div>
+  </div>
+
+  <div class="ring-card">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+        <circle class="ring-track" cx="45" cy="45" r="38"/>
+        <circle class="ring-fill" id="ring90" cx="45" cy="45" r="38" stroke="var(--purple)" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring90pct" style="color:var(--purple)">0%</div>
+        <div class="ring-day" id="ring90day">0/90</div>
+      </div>
+    </div>
+    <div class="ring-lbl" style="color:var(--purple)">90 DAY</div>
+    <div class="ring-goal">Reborn</div>
+  </div>
+</div>
+
+<!-- MAIN COLUMNS -->
+<div class="main-cols">
+
+  <!-- LEFT: CALENDAR + HEATMAP + CHART -->
+  <div style="display:flex;flex-direction:column;gap:var(--sp-4);">
+
+    <!-- CALENDAR -->
+    <div class="card">
+      <div class="cal-nav-row">
+        <div class="cal-month" id="calMonth"></div>
+        <div class="cal-controls">
+          <button class="nav-btn" id="prevM" aria-label="Previous month">‹</button>
+          <button class="btn" style="font-size:var(--fs-xs);padding:5px 12px" id="goTodayBtn">Today</button>
+          <button class="nav-btn" id="nextM" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div class="cal-grid-7" id="calDayNames"></div>
+      <div style="margin-top:6px" id="calGrid"></div>
+      <div style="display:flex;gap:var(--sp-4);margin-top:var(--sp-3);flex-wrap:wrap;font-size:var(--fs-xs);color:var(--text-muted)">
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--green);opacity:.6;border-radius:3px;display:inline-block"></span>Clean</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--red);opacity:.6;border-radius:3px;display:inline-block"></span>Relapse</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:rgba(255,255,255,0.08);border-radius:3px;display:inline-block"></span>Unmarked</span>
+        <span style="margin-left:auto">🔒 Past days locked</span>
+      </div>
+    </div>
+
+    <!-- URGE HEATMAP -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">🌡️</span> 24-Hour Urge Heatmap</div>
+      <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:var(--sp-2)">When do urges peak? Awareness defeats them.</div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div class="hm-labels">
+        <span>12am</span><span>3am</span><span>6am</span><span>9am</span><span>12pm</span><span>3pm</span><span>6pm</span><span>9pm</span><span>11pm</span>
+      </div>
+    </div>
+
+    <!-- URGE BAR CHART -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">📈</span> Weekly Urge Frequency</div>
+      <div style="height:140px;position:relative" id="urgeBarChart"></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- DAILY MOOD -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">🧠</span> Today's Mood</div>
+      <div id="moodSection">
+        <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:var(--sp-3)">How are you feeling right now?</div>
+        <div class="mood-row" id="moodBtns">
+          <button class="mood-btn" data-mood="1" title="Terrible" aria-label="Mood: Terrible">😣</button>
+          <button class="mood-btn" data-mood="2" title="Bad" aria-label="Mood: Bad">😞</button>
+          <button class="mood-btn" data-mood="3" title="Neutral" aria-label="Mood: Neutral">😐</button>
+          <button class="mood-btn" data-mood="4" title="Good" aria-label="Mood: Good">😊</button>
+          <button class="mood-btn" data-mood="5" title="Great" aria-label="Mood: Great">🤩</button>
+        </div>
+        <div id="moodResult" style="font-size:var(--fs-xs);color:var(--text-muted);margin-top:var(--sp-2);text-align:center"></div>
+      </div>
+    </div>
+
+    <!-- COMPANION HABITS -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">💪</span> Companion Habits</div>
+      <div id="habitList"></div>
+      <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-top:var(--sp-2);text-align:center">Each habit earns +10 XP</div>
+    </div>
+
+    <!-- URGE TRACKER -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">⚡</span> Urge Tracker</div>
+      <button class="urge-big-btn">⚡ I FEEL AN URGE</button>
+      <div style="font-size:var(--fs-xs);color:var(--text-muted);text-align:center;margin:var(--sp-2) 0" id="urgeCountToday">0 urges logged today</div>
+      <div style="height:90px;position:relative;margin-top:var(--sp-2)" id="urgeSparkline"></div>
+      <div id="urgeLogList" style="max-height:100px;overflow-y:auto;margin-top:var(--sp-2)" class="scrollbar-thin"></div>
+    </div>
+
+    <!-- DAILY JOURNAL -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">📓</span> Daily Journal</div>
+      <textarea class="jinput" id="journalInput" placeholder="What's on your mind today? Write freely..."></textarea>
+      <button class="btn btn-gold" id="journalSaveBtn" style="width:100%;justify-content:center;font-size:var(--fs-sm)">Save Entry</button>
+      <div id="journalList" style="margin-top:var(--sp-3);max-height:180px;overflow-y:auto" class="scrollbar-thin"></div>
+    </div>
+
+    <!-- BENEFITS TIMELINE -->
+    <div class="card">
+      <div class="card-title"><span class="ct-icon">🌱</span> Benefits Unlocking</div>
+      <div class="benefits-scroll scrollbar-thin" id="benefitsList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="card" style="margin-bottom:var(--sp-5)">
+  <div class="card-title"><span class="ct-icon">🏅</span> Achievement Vault</div>
+  <div class="ach-grid" id="achGrid"></div>
+</div>
+
+<!-- BOTTOM GRID -->
+<div class="bottom-grid">
+
+  <!-- ANALYTICS -->
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">📊</span> Performance Analytics</div>
+    <div style="margin-bottom:var(--sp-3)">
+      <div style="display:flex;justify-content:space-between;font-size:var(--fs-xs);margin-bottom:5px">
+        <span style="color:var(--text-muted)">Clean Rate</span>
+        <span style="color:var(--green);font-weight:var(--fw-semibold)" id="cleanRateLbl">—</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:var(--rad-xs);height:6px;overflow:hidden">
+        <div id="cleanRateBar" style="height:100%;background:linear-gradient(90deg,var(--green-dim),var(--green));border-radius:var(--rad-xs);width:0%;transition:width 1s var(--ease-out)"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:var(--sp-3)">
+      <div style="display:flex;justify-content:space-between;font-size:var(--fs-xs);margin-bottom:5px">
+        <span style="color:var(--text-muted)">Habit Consistency</span>
+        <span style="color:var(--gold);font-weight:var(--fw-semibold)" id="habitRateLbl">—</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:var(--rad-xs);height:6px;overflow:hidden">
+        <div id="habitRateBar" style="height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:var(--rad-xs);width:0%;transition:width 1s var(--ease-out)"></div>
+      </div>
+    </div>
+    <div class="section-sep"></div>
+    <div style="font-size:var(--fs-xs);font-weight:var(--fw-semibold);color:var(--text-muted);text-transform:uppercase;letter-spacing:var(--ls-wider);margin-bottom:var(--sp-2)">This Week</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px" id="weekCells"></div>
+    <div style="height:120px;position:relative;margin-top:var(--sp-4)" id="moodChart"></div>
+  </div>
+
+  <!-- WEEKLY REPORT -->
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">📋</span> Weekly Report</div>
+    <div class="grade-big" id="weekGrade" style="color:var(--green)">—</div>
+    <div id="weekReportRows"></div>
+  </div>
+
+  <!-- RELAPSE REFLECTIONS -->
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">📝</span> Relapse Reflections</div>
+    <div id="reflList" style="max-height:260px;overflow-y:auto" class="scrollbar-thin"></div>
+  </div>
+
+</div>
+
+<!-- OATH + PATTERN ANALYSIS -->
+<div class="bottom-grid-2">
+  <div class="card" id="oathDisplay" style="display:none">
+    <div class="card-title"><span class="ct-icon">📜</span> Your Commitment Oath</div>
+    <div class="oath-box">
+      <div style="font-size:24px;margin-bottom:var(--sp-2)">⚔️</div>
+      <div class="oath-text" id="oathDisplayText"></div>
+      <div class="oath-sig" id="oathDisplayDate"></div>
+    </div>
+  </div>
+  <div class="card" id="oathCta">
+    <div class="card-title"><span class="ct-icon">📜</span> Make Your Oath</div>
+    <div style="font-size:var(--fs-base);color:var(--text-muted);line-height:var(--lh-relaxed);margin-bottom:var(--sp-4)">A warrior makes a vow. Write your commitment to yourself — the words you'll read when the urge hits hardest.</div>
+    <button class="btn btn-gold btn-lg" id="oathCtaBtn" style="width:100%;justify-content:center">⚔️ Take the Oath</button>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">🗺️</span> Pattern Analysis</div>
+    <div id="patternAnalysis" style="font-size:var(--fs-sm);line-height:var(--lh-relaxed);color:var(--text-80)">
+      <div class="empty-state">Log more days to see patterns emerge.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="app-footer">IRON WILL v2.0 — DARK GLASSMORPHISM EDITION</div>
+
+</div><!-- /wrap -->
+
+<!-- ========== MODALS ========== -->
+
+<!-- DAILY CHECK -->
+<div class="overlay" id="dailyCheckModal" style="display:none">
+<div class="modal">
+  <div class="modal-icon">🌄</div>
+  <div class="modal-title">DAILY ACCOUNTABILITY</div>
+  <div class="modal-sub" id="dailyCheckSub">The warrior checks in every day — no exceptions.</div>
+  <div class="modal-actions">
+    <button class="btn btn-green btn-lg" id="markCleanBtn">✅ Stayed Clean — I Won Today</button>
+    <button class="btn btn-red btn-lg" id="markRelapseBtn">❌ I Relapsed — Own It, Learn It</button>
+  </div>
+  <div class="modal-warn">⚠️ Avoiding this check-in = avoiding yourself. You are better than that.</div>
+</div>
+</div>
+
+<!-- REFLECTION -->
+<div class="overlay" id="reflModal" style="display:none">
+<div class="modal">
+  <div class="modal-icon">💭</div>
+  <div class="modal-title">RELAPSE REFLECTION</div>
+  <div class="modal-sub">Relapsing is a lesson, not a death sentence. Understand it. Grow from it.</div>
+  <div class="minput-lbl">What triggered it?</div>
+  <textarea class="minput" id="trigInp" placeholder="Stress, boredom, loneliness, specific content..."></textarea>
+  <div class="minput-lbl">How did you feel afterward?</div>
+  <textarea class="minput" id="feelInp" placeholder="Guilt, emptiness, disappointment — be honest..."></textarea>
+  <div class="minput-lbl">What will you do differently next time?</div>
+  <textarea class="minput" id="planInp" placeholder="Leave the room, call a friend, do 20 push-ups..."></textarea>
+  <div class="modal-actions">
+    <button class="btn btn-red btn-lg" id="saveReflBtn">Save Reflection & Move Forward</button>
+  </div>
+</div>
+</div>
+
+<!-- OATH -->
+<div id="oathOverlay" style="display:none">
+<div class="modal" style="max-width:560px;text-align:center">
+  <div class="modal-icon">⚔️</div>
+  <div class="modal-title">THE WARRIOR'S OATH</div>
+  <div class="modal-sub">Write your personal vow. Make it specific. Make it real.</div>
+  <textarea class="minput" id="oathInput" rows="5" placeholder="I vow to myself that I will...&#10;&#10;Because I deserve to be...&#10;&#10;And I will become..."></textarea>
+  <div class="modal-actions">
+    <button class="btn btn-gold btn-xl" id="takeOathBtn" style="width:100%;justify-content:center">⚔️ I Swear This Oath</button>
+    <button class="btn" id="closeOathBtn" style="width:100%;justify-content:center">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- EMERGENCY -->
+<div id="emergencyOverlay" style="display:none">
+  <div class="em-title">HOLD THE LINE</div>
+  <div class="em-msg" id="emMsg"></div>
+  <div class="breath-wrap">
+    <div class="breath-ring" id="breathRing">BREATHE</div>
+    <div class="breath-txt" id="breathPhase">Inhale slowly...</div>
+  </div>
+  <div class="em-counter" id="emCounter">60</div>
+  <div class="em-sub">seconds — you can outlast this</div>
+  <button class="btn btn-lg" id="closeEmergencyBtn" style="font-size:var(--fs-base)">I Survived the Urge ✓</button>
+</div>
+
+<!-- LEVEL UP -->
+<div id="levelUpOverlay" style="display:none">
+  <div class="lvlup-title">RANK UP</div>
+  <div class="lvlup-ico" id="lvlIco"></div>
+  <div class="lvlup-rank" id="lvlRank"></div>
+  <div style="font-size:var(--fs-md);color:var(--text-muted);margin-bottom:var(--sp-8);max-width:400px">You earned this. Keep going.</div>
+  <button class="btn btn-gold btn-xl" id="closeLevelUpBtn">Continue the Journey</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="display:none" class="toast"></div>
+
+<!-- App Script -->
+<script type="module" src="./js/app.js"></script>
+
+</body>
+</html>

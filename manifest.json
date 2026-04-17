@@ -1,0 +1,20 @@
+{
+  "name": "Iron Will — Warrior Discipline System",
+  "short_name": "Iron Will",
+  "description": "A premium discipline tracking system for warriors of self-mastery.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#060612",
+  "background_color": "#030308",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80'>⚔️</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "en"
+}
