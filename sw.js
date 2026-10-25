@@ -1,12 +1,21 @@
 // ============================================================
 //  IRON WILL — SERVICE WORKER
-//  Cache-first strategy for offline support
+//  Production-grade caching, dynamic limit & offline fallback
 // ============================================================
 
-const CACHE_NAME = 'ironwill-v2';
+const CACHE_NAME = 'ironwill-v3.1';
+const OFFLINE_URL = './offline.html';
+const MAX_CACHED_DYNAMIC_ENTRIES = 50;
+
 const ASSETS = [
   './',
   './index.html',
+  OFFLINE_URL,
+  './manifest.json',
+  './icons/icon-192.svg',
+  './icons/icon-512.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './css/tokens.css',
   './css/base.css',
   './css/layout.css',
@@ -24,8 +33,22 @@ const ASSETS = [
   './js/emergency.js',
   './js/particles.js',
   './js/audio.js',
-  './manifest.json',
+  './js/navigation.js',
+  './js/analytics.js',
+  './js/focus.js',
+  './js/toast.js'
 ];
+
+async function cacheResponse(request, response) {
+  if (!response || !response.ok) return;
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response);
+  const keys = await cache.keys();
+  const dynamic = keys.filter(key => !ASSETS.some(asset => new URL(asset, self.location).href === key.url));
+  while (dynamic.length > MAX_CACHED_DYNAMIC_ENTRIES) {
+    await cache.delete(dynamic.shift());
+  }
+}
 
 // Install — cache all assets
 self.addEventListener('install', (e) => {
@@ -47,12 +70,11 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Fetch — cache-first, network fallback
+// Fetch — cache-first with network fallback and offline page
 self.addEventListener('fetch', (e) => {
-  // Only handle GET requests
   if (e.request.method !== 'GET') return;
 
-  // Skip external requests (fonts, etc.)
+  // Skip external cross-origin requests
   if (!e.request.url.startsWith(self.location.origin)) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
@@ -61,25 +83,24 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) {
-        // Return cached, but also update cache in background
-        const fetchPromise = fetch(e.request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        // Revalidate in background
+        fetch(e.request).then(response => {
+          if (response && response.ok) {
+            cacheResponse(e.request, response.clone());
           }
-          return response;
         }).catch(() => {});
-
         return cached;
       }
 
-      // Not cached — fetch from network
       return fetch(e.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        if (response && response.ok) {
+          cacheResponse(e.request, response.clone());
         }
         return response;
+      }).catch(async () => {
+        if (e.request.mode === 'navigate') {
+          return caches.match(OFFLINE_URL);
+        }
       });
     })
   );

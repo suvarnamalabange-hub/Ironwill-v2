@@ -1,24 +1,26 @@
 // ============================================================
 //  IRON WILL — CALENDAR
-//  Calendar rendering & interactions
+//  Calendar rendering & interactions + Urge Heatmap
 // ============================================================
 
 import { state } from './state.js';
 import { ds, pd, getToday, isFuture, isToday, MONTHS, DAYS } from './utils.js';
-import { showToast } from './app.js';
+import { showToast } from './toast.js';
 
 let calYear, calMonth;
+let calendarInitialized = false;
 
 export function initCalendar() {
   const now = new Date();
   calYear = now.getFullYear();
   calMonth = now.getMonth();
 
+  if (calendarInitialized) return;
+  calendarInitialized = true;
+
   // Day name headers
   const dn = document.getElementById('calDayNames');
-  if (dn) {
-    dn.innerHTML = DAYS.map(d => `<div class="cal-dn">${d}</div>`).join('');
-  }
+  if (dn) dn.innerHTML = DAYS.map(d => `<div class="cal-dn">${d}</div>`).join('');
 
   // Nav buttons
   document.getElementById('prevM')?.addEventListener('click', () => {
@@ -32,6 +34,8 @@ export function initCalendar() {
     if (calMonth > 11) { calMonth = 0; calYear++; }
     renderCalendar();
   });
+
+  document.getElementById('goTodayBtn')?.addEventListener('click', goToday);
 }
 
 export function goToday() {
@@ -66,7 +70,7 @@ export function renderCalendar() {
   // Day cells
   for (let d = 1; d <= totalDays; d++) {
     const dStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const status = state.days[dStr];
+    const status = (state.days || {})[dStr];
     const mood = (state.moods || {})[dStr];
     const future = isFuture(dStr);
     const todayFlag = isToday(dStr);
@@ -87,6 +91,7 @@ export function renderCalendar() {
     `;
 
     if (!future && !status) {
+      c.style.cursor = 'pointer';
       c.addEventListener('click', () => handleCalClick(dStr));
     } else if (status) {
       c.title = `${status === 'clean' ? '✅ Clean' : '❌ Relapse'} — Locked`;
@@ -96,18 +101,63 @@ export function renderCalendar() {
   }
 
   gridEl.appendChild(g);
+  drawHeatmap();
 }
 
 function handleCalClick(dStr) {
   if (isFuture(dStr)) return;
-  if (state.days[dStr]) {
-    showToast('🔒 Day already marked. No editing. Stay accountable.', 'warn');
+  if ((state.days || {})[dStr]) {
+    showToast('🔒 Day already recorded. Accountability is absolute.', 'warn');
     return;
   }
   if (!isToday(dStr)) {
-    showToast('⚠️ Past days can only be marked on the day itself.', 'warn');
+    showToast('⚠️ Past days cannot be backdated. Stay present.', 'warn');
     return;
   }
-  // Trigger daily check modal
+  // Open daily check modal
   window.dispatchEvent(new CustomEvent('show-daily-check'));
+}
+
+/** Render 24-hour urge heatmap */
+export function drawHeatmap() {
+  const container = document.getElementById('heatmapGrid');
+  if (!container) return;
+
+  container.innerHTML = '';
+  const hourlyCounts = Array(24).fill(0);
+  (state.urges || []).forEach(u => {
+    if (typeof u.hour === 'number' && u.hour >= 0 && u.hour < 24) {
+      hourlyCounts[u.hour]++;
+    }
+  });
+
+  const max = Math.max(...hourlyCounts, 1);
+
+  // Set grid style if not defined
+  container.style.display = 'grid';
+  container.style.gridTemplateColumns = 'repeat(24, 1fr)';
+  container.style.gap = '3px';
+  container.style.margin = '10px 0';
+
+  hourlyCounts.forEach((count, hour) => {
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    const intensity = count === 0 ? 0 : Math.min(1, 0.25 + (count / max) * 0.75);
+
+    if (count > 0) {
+      cell.style.background = `rgba(232, 64, 64, ${intensity})`;
+      cell.style.boxShadow = `0 0 ${count * 3}px rgba(232, 64, 64, 0.4)`;
+    } else {
+      cell.style.background = 'rgba(255, 255, 255, 0.04)';
+    }
+
+    const ampm = hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`;
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'hm-tooltip';
+    tooltip.textContent = `${ampm}: ${count} urge${count === 1 ? '' : 's'} resisted`;
+    cell.appendChild(tooltip);
+
+    container.appendChild(cell);
+  });
 }

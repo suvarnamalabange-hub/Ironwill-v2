@@ -1,23 +1,27 @@
 // ============================================================
 //  IRON WILL — UTILITIES
-//  Date helpers, debounce, escape, formatters
+//  Date helpers, debounce, escape, formatters, animations
 // ============================================================
+
+import { triggerParticles } from './particles.js';
 
 export const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 export const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 /** Date → 'YYYY-MM-DD' */
 export function ds(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const date = d instanceof Date ? d : new Date(d);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-/** 'YYYY-MM-DD' → Date */
+/** 'YYYY-MM-DD' → Date in local time */
 export function pd(s) {
+  if (!s || typeof s !== 'string') return new Date();
   const [y, m, d] = s.split('-').map(Number);
   return new Date(y, m - 1, d);
 }
 
-/** Get today's date string */
+/** Get today's date string in YYYY-MM-DD */
 export function getToday() {
   return ds(new Date());
 }
@@ -32,14 +36,19 @@ export function isToday(s) {
   return s === getToday();
 }
 
-/** Escape HTML entities */
+/** Escape HTML entities safely */
 export function esc(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
+  if (s === null || s === undefined) return '';
+  const str = String(s);
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-/** Debounce function */
+/** Debounce function execution */
 export function debounce(fn, ms = 300) {
   let timer;
   return function(...args) {
@@ -61,31 +70,61 @@ export function rafThrottle(fn) {
   };
 }
 
-/** Animate a number counter */
-export function animNum(el, target, duration = 800) {
-  const start = parseInt(el.textContent) || 0;
-  if (start === target) return;
+const activeNumberAnimations = new WeakMap();
 
-  const diff = target - start;
+/** Animate a numeric counter with cancellation of overlapping animations */
+export function animateNum(elOrId, target, duration = 400) {
+  const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+  if (!el) return;
+
+  const numericTarget = Math.max(0, Math.round(Number(target) || 0));
+  const currentVal = parseInt(el.textContent, 10);
+  const start = Number.isFinite(currentVal) ? currentVal : 0;
+
+  if (start === numericTarget) {
+    el.textContent = String(numericTarget);
+    return;
+  }
+
+  // Cancel any running animation on this element
+  if (activeNumberAnimations.has(el)) {
+    cancelAnimationFrame(activeNumberAnimations.get(el));
+    activeNumberAnimations.delete(el);
+  }
+
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || duration <= 0) {
+    el.textContent = String(numericTarget);
+    return;
+  }
+
+  const diff = numericTarget - start;
   const startTime = performance.now();
 
   function step(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // Ease out cubic
     const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(start + diff * eased);
-    if (progress < 1) requestAnimationFrame(step);
+    const nextVal = Math.max(0, Math.round(start + diff * eased));
+    el.textContent = String(nextVal);
+
+    if (progress < 1) {
+      const animId = requestAnimationFrame(step);
+      activeNumberAnimations.set(el, animId);
+    } else {
+      el.textContent = String(numericTarget);
+      activeNumberAnimations.delete(el);
+    }
   }
 
-  requestAnimationFrame(step);
+  const initialAnimId = requestAnimationFrame(step);
+  activeNumberAnimations.set(el, initialAnimId);
 }
 
-/** Get last 7 days as date strings */
-export function get7Days() {
+/** Get last N days as date strings */
+export function getDays(count) {
   const days = [];
   const now = new Date();
-  for (let i = 6; i >= 0; i--) {
+  for (let i = count - 1; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
     days.push(ds(d));
@@ -93,10 +132,16 @@ export function get7Days() {
   return days;
 }
 
-/** Format date for display */
-export function formatDate(dateStr, options) {
-  const defaults = { weekday: 'short', month: 'short', day: 'numeric' };
-  return pd(dateStr).toLocaleDateString('en-US', options || defaults);
+export function get7Days() {
+  return getDays(7);
+}
+
+export function get30Days() {
+  return getDays(30);
+}
+
+export function get90Days() {
+  return getDays(90);
 }
 
 /** Clamp a value between min and max */
@@ -104,8 +149,25 @@ export function clamp(val, min, max) {
   return Math.min(Math.max(val, min), max);
 }
 
-/** Generate unique ID */
-let _idCounter = 0;
+/** Generate unique ID with crypto fallback */
 export function uid() {
-  return `iw_${Date.now()}_${++_idCounter}`;
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID().slice(0, 8);
+  }
+  return Math.random().toString(36).substring(2, 10);
+}
+
+/** Format date key or Date object into human-readable string */
+export function formatDate(date, options = { month: 'short', day: 'numeric', weekday: 'short' }) {
+  const d = typeof date === 'string' ? pd(date) : date;
+  return d.toLocaleDateString('en-US', options);
+}
+
+/** Trigger confetti celebration particles */
+export function triggerConfetti() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  triggerParticles(W * 0.2, H * 0.5, '#f5c842', 40);
+  triggerParticles(W * 0.8, H * 0.5, '#3b82f6', 40);
+  triggerParticles(W * 0.5, H * 0.3, '#22c55e', 60);
 }

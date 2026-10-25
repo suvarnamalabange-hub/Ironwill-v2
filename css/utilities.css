@@ -34,7 +34,7 @@
   font-size: var(--fs-sm);
   z-index: var(--z-toast);
   animation: toastIn var(--dur-slow) var(--ease-out);
-  max-width: 360px;
+  max-width: 380px;
   box-shadow: var(--shadow-xl);
   display: flex;
   align-items: center;
@@ -46,9 +46,24 @@
   animation: toastOut var(--dur-base) var(--ease-smooth) forwards;
 }
 .toast.ok   { border-left: 3px solid var(--green); }
-.toast.err  { border-left: 3px solid var(--red); }
+.toast.err, .toast.error  { border-left: 3px solid var(--red); }
 .toast.warn { border-left: 3px solid var(--gold); }
 .toast.info { border-left: 3px solid var(--blue); }
+
+@media (max-width: 959px) {
+  .toast {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  }
+}
+
+@media (max-width: 640px) {
+  .toast {
+    right: 50%;
+    transform: translateX(50%);
+    max-width: calc(100vw - 32px);
+    width: auto;
+  }
+}
 
 /* ---- GLASS HELPERS ---- */
 .glass-subtle {

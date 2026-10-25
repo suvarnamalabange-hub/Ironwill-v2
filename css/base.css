@@ -63,6 +63,16 @@ body::after {
   overflow: hidden;
 }
 
+/* ---- PARTICLE CANVAS ---- */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: var(--z-particle);
+}
+
 .orb {
   position: absolute;
   border-radius: 50%;
@@ -124,6 +134,20 @@ body::after {
   25%  { transform: translate3d(40px, 20px, 0) scale(1.1); }
   75%  { transform: translate3d(-30px, -40px, 0) scale(0.92); }
   100% { transform: translate3d(20px, -20px, 0) scale(1.05); }
+}
+
+@media (max-width: 640px) {
+  .bg-orbs .orb {
+    filter: blur(40px);
+    opacity: 0.5;
+  }
+  .bg-orbs .orb1, .bg-orbs .orb2 {
+    width: 280px;
+    height: 280px;
+  }
+  .bg-orbs .orb3, .bg-orbs .orb4 {
+    display: none;
+  }
 }
 
 /* ---- SELECTION ---- */

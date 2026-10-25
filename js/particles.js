@@ -81,7 +81,7 @@ function loop() {
     p.rotation += p.spin;
 
     const alpha = Math.max(0, p.life);
-    const s = p.size * p.life;
+    const s = Math.max(0, p.size * p.life);
 
     if (p.shape === 'star') {
       ctx.fillStyle = p.color;
