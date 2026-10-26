@@ -149,33 +149,217 @@ export function drawStreakTimeline() {
   container.appendChild(svgEl);
 }
 
-// ---- MONTHLY HEATMAP (GitHub-style) ----
+// ---- MONTHLY HEATMAP (LeetCode Activity Matrix) ----
 export function drawMonthlyHeatmap() {
   const container = document.getElementById('monthlyHeatmap');
   if (!container) return;
 
-  const days = getDaysBack(180);
   container.innerHTML = '';
 
-  const grid = document.createElement('div');
-  grid.className = 'mheatmap-grid';
+  const numWeeks = 26; // 26 weekly columns (~6 months / 182 days)
+  const today = new Date();
+  const todayStr = ds(today);
+  const todayDow = today.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
 
-  days.forEach(d => {
-    const cell = document.createElement('div');
-    cell.className = 'mheatmap-cell';
-    const status = state.days[d];
-    if (status === 'clean') {
-      cell.classList.add('clean');
-    } else if (status === 'relapse') {
-      cell.classList.add('relapse');
+  // Start date: Sunday, (numWeeks - 1) weeks ago
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - (numWeeks - 1) * 7 - todayDow);
+  startDate.setHours(0, 0, 0, 0);
+
+  // Collect days & stats in this range
+  let cleanCount = 0;
+  let recordedDays = 0;
+  const daysMap = state.days || {};
+
+  // Outer container
+  const wrap = document.createElement('div');
+  wrap.className = 'lc-heatmap-container';
+
+  // 1. Header with Stats
+  const header = document.createElement('div');
+  header.className = 'lc-heatmap-header';
+
+  // 2. Scroll wrapper
+  const scrollWrap = document.createElement('div');
+  scrollWrap.className = 'lc-heatmap-scroll';
+
+  const board = document.createElement('div');
+  board.className = 'lc-heatmap-board';
+
+  // Months header row
+  const monthsRow = document.createElement('div');
+  monthsRow.className = 'lc-months-row';
+
+  let lastMonth = -1;
+  for (let w = 0; w < numWeeks; w++) {
+    const weekDate = new Date(startDate);
+    weekDate.setDate(startDate.getDate() + w * 7);
+    const m = weekDate.getMonth();
+    if (m !== lastMonth) {
+      const lbl = document.createElement('span');
+      lbl.className = 'lc-month-lbl';
+      lbl.textContent = weekDate.toLocaleString('en-US', { month: 'short' });
+      lbl.style.gridColumn = String(w + 1);
+      monthsRow.appendChild(lbl);
+      lastMonth = m;
     }
+  }
+  board.appendChild(monthsRow);
 
-    const date = pd(d);
-    cell.title = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${status || 'unmarked'}`;
-    grid.appendChild(cell);
+  // Grid body: Weekday labels + cells matrix
+  const gridBody = document.createElement('div');
+  gridBody.className = 'lc-grid-body';
+
+  // Weekday column: Sun, Mon, Tue, Wed, Thu, Fri, Sat (with Mon, Wed, Fri emphasized)
+  const daysCol = document.createElement('div');
+  daysCol.className = 'lc-days-col';
+  const dayNames = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+  dayNames.forEach(name => {
+    const s = document.createElement('span');
+    s.textContent = name;
+    daysCol.appendChild(s);
   });
+  gridBody.appendChild(daysCol);
 
-  container.appendChild(grid);
+  // Cells grid: 7 rows high, flowing down columns (Sunday = row 0 ... Saturday = row 6)
+  const cellsGrid = document.createElement('div');
+  cellsGrid.className = 'lc-cells-grid';
+
+  // Setup single tooltip in document
+  let tooltip = document.getElementById('lcGlobalTooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'lcGlobalTooltip';
+    tooltip.className = 'lc-tooltip';
+    document.body.appendChild(tooltip);
+  }
+
+  // Iterate columns (weeks), then rows (days 0-6)
+  for (let w = 0; w < numWeeks; w++) {
+    for (let d = 0; d < 7; d++) {
+      const cellDate = new Date(startDate);
+      cellDate.setDate(startDate.getDate() + w * 7 + d);
+      const dStr = ds(cellDate);
+
+      const cell = document.createElement('div');
+      cell.className = 'lc-cell';
+      cell.dataset.date = dStr;
+
+      const isFuture = cellDate > today;
+      const isToday = dStr === todayStr;
+      const status = daysMap[dStr];
+
+      if (isToday) {
+        cell.classList.add('today');
+      }
+
+      if (isFuture) {
+        cell.classList.add('future');
+      } else {
+        if (status === 'clean') {
+          cell.classList.add('clean');
+          cleanCount++;
+          recordedDays++;
+        } else if (status === 'relapse') {
+          cell.classList.add('relapse');
+          recordedDays++;
+        }
+      }
+
+      // Tooltip events
+      cell.addEventListener('mouseenter', () => {
+        if (isFuture) return;
+        const formatted = cellDate.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        const statusText = status === 'clean' ? 'Clean (Resisted)' : status === 'relapse' ? 'Relapse' : 'No record';
+        const statusClass = status || 'unmarked';
+
+        tooltip.innerHTML = `
+          <div class="lc-tooltip-date">${formatted}</div>
+          <div class="lc-tooltip-status ${statusClass}">${status === 'clean' ? '✓ ' : status === 'relapse' ? '✗ ' : ''}${statusText}</div>
+        `;
+
+        const rect = cell.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + rect.width / 2}px`;
+        tooltip.style.top = `${rect.top}px`;
+        tooltip.classList.add('visible');
+      });
+
+      cell.addEventListener('mouseleave', () => {
+        tooltip.classList.remove('visible');
+      });
+
+      cellsGrid.appendChild(cell);
+    }
+  }
+
+  gridBody.appendChild(cellsGrid);
+  board.appendChild(gridBody);
+  scrollWrap.appendChild(board);
+
+  // Update Header with Clean Count & Resilience Rate
+  const resilienceRate = recordedDays ? Math.round((cleanCount / recordedDays) * 100) : 100;
+  header.innerHTML = `
+    <div class="lc-heatmap-stats">
+      <span class="stat-tag">Clean Days: <strong class="highlight-green">${cleanCount}</strong></span>
+      <span class="stat-tag">Window: <strong>180 Days</strong></span>
+      <span class="stat-tag">Resilience: <strong class="highlight-gold">${resilienceRate}%</strong></span>
+    </div>
+  `;
+
+  // 3. Footer with Legend
+  const footer = document.createElement('div');
+  footer.className = 'lc-heatmap-footer';
+  footer.innerHTML = `
+    <div style="font-size:11px;color:var(--text-muted)">
+      Hover over any square to view daily discipline record
+    </div>
+    <div class="lc-legend">
+      <span>Unmarked</span>
+      <span class="lc-legend-cell empty"></span>
+      <span class="lc-legend-cell clean"></span>
+      <span>Clean</span>
+      <span class="lc-legend-cell relapse"></span>
+      <span>Relapse</span>
+    </div>
+  `;
+
+  wrap.appendChild(header);
+  wrap.appendChild(scrollWrap);
+  wrap.appendChild(footer);
+
+  // Outer Wrapper with LeetCode Stats Breakdown Sidebar
+  const outerWrapper = document.createElement('div');
+  outerWrapper.className = 'lc-heatmap-wrapper';
+  outerWrapper.appendChild(wrap);
+
+  const sidebar = document.createElement('div');
+  sidebar.className = 'lc-stats-sidebar';
+  sidebar.innerHTML = `
+    <div class="lc-stat-item">
+      <span class="lc-stat-lbl">Active Clean Days</span>
+      <span class="lc-stat-val green">${cleanCount}</span>
+    </div>
+    <div class="lc-stat-item">
+      <span class="lc-stat-lbl">Current Streak</span>
+      <span class="lc-stat-val gold">${state.streak || 0}d</span>
+    </div>
+    <div class="lc-stat-item">
+      <span class="lc-stat-lbl">Best Streak</span>
+      <span class="lc-stat-val">${state.longestStreak || 0}d</span>
+    </div>
+    <div class="lc-stat-item">
+      <span class="lc-stat-lbl">Resilience Rate</span>
+      <span class="lc-stat-val ${resilienceRate >= 80 ? 'green' : ''}">${resilienceRate}%</span>
+    </div>
+  `;
+  outerWrapper.appendChild(sidebar);
+
+  container.appendChild(outerWrapper);
 }
 
 // ---- RADAR CHART (Day-of-Week Vulnerability) ----

@@ -1404,6 +1404,298 @@ textarea.minput::placeholder { color: var(--text-40); }
 .mheatmap-cell.relapse { background: var(--red); opacity: 0.8; }
 .mheatmap-cell:hover { transform: scale(1.3); z-index: 10; opacity: 1; }
 
+/* ===== LEETCODE-STYLE RESILIENCE HEATMAP ===== */
+.lc-heatmap-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .lc-heatmap-wrapper {
+    grid-template-columns: 1fr 240px;
+    align-items: center;
+  }
+}
+
+.lc-stats-sidebar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-1);
+  border-radius: var(--rad-lg);
+}
+
+@media (min-width: 1024px) {
+  .lc-stats-sidebar {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+}
+
+.lc-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lc-stat-lbl {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--ff-mono);
+}
+
+.lc-stat-val {
+  font-family: var(--ff-display);
+  font-size: var(--fs-xl);
+  color: var(--text-100);
+  line-height: 1.1;
+}
+
+.lc-stat-val.green { color: var(--green); }
+.lc-stat-val.gold { color: var(--gold); }
+
+.lc-heatmap-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.lc-heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.lc-heatmap-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  font-family: var(--ff-mono);
+  font-size: var(--fs-xs);
+}
+
+.lc-heatmap-stats .stat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lc-heatmap-stats strong {
+  color: var(--text-100);
+  font-weight: var(--fw-bold);
+}
+
+.lc-heatmap-stats .highlight-green {
+  color: var(--green);
+}
+
+.lc-heatmap-stats .highlight-gold {
+  color: var(--gold);
+}
+
+.lc-heatmap-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lc-heatmap-board {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: fit-content;
+  user-select: none;
+}
+
+.lc-months-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 14px;
+  gap: 4px;
+  height: 20px;
+  margin-left: 34px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--ff-mono);
+  user-select: none;
+}
+
+.lc-month-lbl {
+  white-space: nowrap;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.5px;
+}
+
+.lc-grid-body {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.lc-days-col {
+  display: grid;
+  grid-template-rows: repeat(7, 14px);
+  gap: 4px;
+  font-size: 9px;
+  font-family: var(--ff-mono);
+  color: var(--text-muted);
+  line-height: 14px;
+  text-align: right;
+  width: 26px;
+  user-select: none;
+  padding-top: 1px;
+}
+
+.lc-cells-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 14px);
+  grid-auto-flow: column;
+  grid-auto-columns: 14px;
+  gap: 4px;
+}
+
+.lc-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 2.5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.lc-cell:hover:not(.future):not(.empty) {
+  transform: scale(1.35);
+  z-index: 25;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.lc-cell.clean {
+  background: #22c55e !important;
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.35);
+}
+
+.lc-cell.relapse {
+  background: #e84040 !important;
+  border-color: rgba(232, 64, 64, 0.5) !important;
+  box-shadow: 0 0 6px rgba(232, 64, 64, 0.35);
+}
+
+.lc-cell.today {
+  outline: 1.5px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.lc-cell.future {
+  opacity: 0.12;
+  cursor: default;
+  pointer-events: none;
+}
+
+.lc-cell.empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.lc-heatmap-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-2);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.lc-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-family: var(--ff-mono);
+  color: var(--text-muted);
+}
+
+.lc-legend-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.lc-legend-cell.empty {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.lc-legend-cell.clean {
+  background: #22c55e;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.3);
+}
+
+.lc-legend-cell.relapse {
+  background: #e84040;
+}
+
+.lc-tooltip {
+  position: fixed;
+  background: #141424;
+  border: 1px solid var(--border-2);
+  padding: 6px 10px;
+  border-radius: var(--rad-sm);
+  font-size: 11px;
+  font-family: var(--ff-body);
+  color: var(--text-100);
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: var(--shadow-lg), 0 0 12px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  transform: translate(-50%, -125%);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  opacity: 0;
+}
+
+.lc-tooltip.visible {
+  opacity: 1;
+}
+
+.lc-tooltip-date {
+  font-weight: var(--fw-semibold);
+  color: var(--text-90);
+  margin-bottom: 2px;
+}
+
+.lc-tooltip-status {
+  font-size: 11px;
+  font-family: var(--ff-mono);
+}
+
+.lc-tooltip-status.clean { color: #22c55e; }
+.lc-tooltip-status.relapse { color: #e84040; }
+.lc-tooltip-status.unmarked { color: var(--text-muted); }
+
+
 .trend-card {
   background: var(--bg-1);
   border: 1px solid var(--border-1);
